@@ -61,6 +61,14 @@ await $('android=new UiSelector().resourceId("com.app:id/entrar")').click();
 Se a validação não passar, o teste deve falhar.
 `
 
+/**
+ * Gera um comando TypeScript a partir de um prompt, XML e elemento.
+ * @param prompt - O prompt fornecido pelo usuário.
+ * @param xml - O XML da tela atual.
+ * @param timeoutMsg - A mensagem de timeout.
+ * @param element - O elemento a ser utilizado.
+ * @returns O comando TypeScript gerado.
+ */
 export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, element?: string): Promise<string> {
 
   const fullPrompt = element
