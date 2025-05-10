@@ -2,7 +2,7 @@
 
 Projeto para execução de testes mobile com WebdriverIO com IA.
 
-## Arquivo .env
+## Crie um arquivo .env na raiz do projeto
 
 ``` env
 OPENAI_API_KEY=''
@@ -15,6 +15,8 @@ PORT=3030
 ```
 
 ## Como usar
+
+### Crie o script
 
 ``` typescript
 import { iawdio } from '../../src/agent/iawdio'
@@ -38,3 +40,11 @@ describe('Fluxo com iawdio', () => {
     })
 })
 ```
+
+### Inicie a API para integrar com openIA
+
+`npm run start:api`
+
+### Execute seus testes mobile
+
+`npm run wdio`

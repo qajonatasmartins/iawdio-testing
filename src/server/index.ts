@@ -4,8 +4,10 @@ import type { RequestHandler } from 'express';
 import * as dotenv from 'dotenv';
 import { parseAndGenerateCommand } from './llm.service';
 import { getPageXML } from '../agent/appium.helper';
+import path from 'node:path';
 
-dotenv.config();
+// Carrega o arquivo .env do diretório raiz
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const app = express();
 app.use(express.json());

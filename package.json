@@ -9,7 +9,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "wdio run wdio.conf.ts"
+    "wdio": "wdio run ./__test__/wdio.conf.ts",
+    "start:api": "ts-node -r dotenv/config src/server/index.ts"
   },
   "keywords": [
     "wdio-plugin",

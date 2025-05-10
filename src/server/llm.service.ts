@@ -1,6 +1,10 @@
 import { OpenAI } from 'openai'
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error('Variável de ambiente OPENAI_API_KEY é necessária');
+}
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 const BASE_PROMPT = `Você é um assistente de automação de testes mobile com Appium + WebdriverIO.
 Seu objetivo é interpretar comandos escritos em português e gerar comandos TypeScript para testes automatizados.
@@ -57,16 +61,16 @@ await $('android=new UiSelector().resourceId("com.app:id/entrar")').click();
 Se a validação não passar, o teste deve falhar.
 `
 
-export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, mapeamento?: string): Promise<string> {
+export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, element?: string): Promise<string> {
 
-  const fullPrompt = mapeamento
+  const fullPrompt = element
     ? `
 📌 Mapeamento fornecido:
 A variável "mapeamento" já contém o seletor WebdriverIO válido para o elemento desejado.
-Portanto, não leia o XML. Apenas utilize diretamente o seletor. Exemplo: Aplique a ação solicitada sobre esse elemento: $('${mapeamento}').setValue("valor") ou $('${mapeamento}').click() ou $('${mapeamento}').getText()
+Portanto, não leia o XML. Apenas utilize diretamente o seletor. Exemplo: Aplique a ação solicitada sobre esse elemento: $('${element}').setValue("valor") ou $('${element}').click() ou $('${element}').getText()
 
 🛑 Regras obrigatórias:
-- Sempre aguarde o elemento: await $('${mapeamento}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} });
+- Sempre aguarde o elemento: await $('${element}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} });
 - Se o elemento não existir ou o valor não estiver correto, o teste deve falhar imediatamente. Aqui você deve usar as validações da biblioteca do Chai(expect, should, assert) ou do WebdriverIO(expect).
 📌 Comando do usuário:
 ${prompt}

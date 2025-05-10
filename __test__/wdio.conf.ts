@@ -1,3 +1,4 @@
+//@ts-ignore
 import type { Options } from '@wdio/types'
 import * as path from 'node:path'
 
@@ -27,7 +28,7 @@ export const config: Options.Testrunner = {
     // of the config file unless it's absolute.
     //
     specs: [
-        './__tests__/**/*.test.ts'
+        './**/**/*.test.ts'
     ],
     // Patterns to exclude.
     exclude: [
@@ -66,7 +67,7 @@ export const config: Options.Testrunner = {
             'appium:fullReset': false,
             'appium:platformVersion': process.env.APP_VERSION,
             'appium:automationName': 'UiAutomator2',
-            'appium:app': path.resolve(`./app/${process.env.APK_NAME}.apk`),
+            'appium:app': path.resolve(`./__test__/app/${process.env.APK_NAME}.apk`),
             "appium:unicodeKeyboard": true,
             "appium:autoGrantPermissions": true
         }
