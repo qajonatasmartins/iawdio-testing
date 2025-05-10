@@ -1,3 +1,4 @@
+import { driver } from '@wdio/globals'
 import { parseAndGenerateCommand } from '../server/llm.service'
 import { getPageXML } from './appium.helper'
 

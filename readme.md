@@ -1,89 +1,40 @@
-# IAWDIO Testing
+# iawdio-testing
 
-Uma biblioteca para automação de testes mobile usando WebdriverIO com capacidades de IA.
+Projeto para execução de testes mobile com WebdriverIO com IA.
 
-## Instalação
+## Arquivo .env
 
-```bash
-npm install iawdio-testing
-# ou
-yarn add iawdio-testing
-# ou
-pnpm add iawdio-testing
+``` env
+OPENAI_API_KEY=''
+APK_NAME=''
+APP_ACTIVITY=""
+APP_PACKAGE=""
+APP_VERSION=''
+URL_API='http://localhost'
+PORT=3030
 ```
 
-## Requisitos
+## Como usar
 
-- Node.js 16 ou superior
-- WebdriverIO 9.x
-- Appium 2.x
-- Uma chave de API da OpenAI
+``` typescript
+import { iawdio } from '../../src/agent/iawdio'
 
-## Configuração
+describe('Fluxo com iawdio', () => {
 
-1. Primeiro, configure suas credenciais da OpenAI:
+    it('deve executar os comandos a partir do prompt em português', async () => {
+        const enter = 'android=new UiSelector().resourceId("loginZB")'
+        const username = 'android=new UiSelector().resourceId("textInputEditText").text("Usuário")'
+        const password = 'android=new UiSelector().resourceId("textInputEditText").text("Senha")'
+        const toast = '/hierarchy/android.widget.Toast[@package="com.android.settings"]'
 
-```typescript
-import { setupIATesting } from 'iawdio-testing';
+        await iawdio("No campo 'Usuário' informe o valor 'XPTO'", { timeoutMsg: "O campo de usuário não foi encontrado", mapeamento: username })
 
-await setupIATesting({
-  openaiApiKey: 'sua-chave-api-aqui',
-  model: 'gpt-4', // opcional
-  temperature: 0.7 // opcional
-});
+        await iawdio("No campo 'Senha' informe o valor '123456'", { timeoutMsg: "O campo de senha não foi encontrado", mapeamento: password })
+
+        await iawdio("Clique no botão 'Entrar'", { timeoutMsg: "O botão de login não foi encontrado", mapeamento: enter })
+
+        await iawdio("É esperado que seja exibida a mensagem de 'Login incorreto'",
+            { timeoutMsg: "A mensagem de login incorreto não foi encontrada", mapeamento: toast })
+    })
+})
 ```
-
-2. Configure seu teste mobile:
-
-```typescript
-import { runAITest } from 'iawdio-testing';
-
-const testConfig = {
-  deviceName: 'Pixel_4',
-  platformName: 'Android',
-  automationName: 'UiAutomator2',
-  appPackage: 'com.example.app',
-  appActivity: 'com.example.app.MainActivity'
-};
-
-await runAITest(testConfig, 'Faça login no aplicativo usando as credenciais de teste');
-```
-
-## Exemplos de Uso
-
-### Teste Básico
-
-```typescript
-import { runAITest } from 'iawdio-testing';
-
-const testConfig = {
-  deviceName: 'iPhone_12',
-  platformName: 'iOS',
-  automationName: 'XCUITest',
-  app: '/caminho/para/seu/app.app'
-};
-
-await runAITest(testConfig, 'Navegue até a tela de perfil e verifique se o nome do usuário está correto');
-```
-
-### Teste com Configurações Personalizadas
-
-```typescript
-import { runAITest, IAConfig } from 'iawdio-testing';
-
-const iaConfig: IAConfig = {
-  openaiApiKey: 'sua-chave-api-aqui',
-  model: 'gpt-4',
-  temperature: 0.5
-};
-
-await setupIATesting(iaConfig);
-```
-
-## Contribuindo
-
-Contribuições são bem-vindas! Por favor, leia nosso guia de contribuição antes de enviar um pull request.
-
-## Licença
-
-ISC

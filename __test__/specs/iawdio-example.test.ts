@@ -1,11 +1,11 @@
-import { iawdio } from '../src/agent/iawdio'
+import { iawdio } from '../../src/agent/iawdio'
 
 describe('Fluxo com iawdio', () => {
 
     it('deve executar os comandos a partir do prompt em português', async () => {
-        const enter = 'android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/loginZB")'
-        const username = 'android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/textInputEditText").text("Usuário")'
-        const password = 'android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/textInputEditText").text("Senha")'
+        const enter = `android=new UiSelector().resourceId("${process.env.APP_PACKAGE}:id/loginZB")`
+        const username = `android=new UiSelector().resourceId("${process.env.APP_PACKAGE}:id/textInputEditText").text("Usuário")`
+        const password = `android=new UiSelector().resourceId("${process.env.APP_PACKAGE}:id/textInputEditText").text("Senha")`
         const toast = '/hierarchy/android.widget.Toast[@package="com.android.settings"]'
 
         await iawdio("No campo 'Usuário' informe o valor 'jonatas'", { timeoutMsg: "O campo de usuário não foi encontrado", mapeamento: username })

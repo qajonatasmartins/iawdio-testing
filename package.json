@@ -9,10 +9,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc",
-    "test": "wdio run wdio.conf.ts",
-    "prepublishOnly": "npm run build",
-    "prepare": "npm run build"
+    "test": "wdio run wdio.conf.ts"
   },
   "keywords": [
     "wdio-plugin",
@@ -36,6 +33,7 @@
   "homepage": "https://github.com/seu-usuario/iawdio-testing#readme",
   "devDependencies": {
     "@types/express": "^5.0.1",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.15.17",
     "@types/webdriverio": "^5.0.0",
     "@wdio/allure-reporter": "^9.12.6",
@@ -55,6 +53,7 @@
     "@wdio/types": "^9.12.6",
     "appium-uiautomator2-driver": "^4.2.3",
     "chai": "^5.2.0",
+    "mocha": "^11.2.2",
     "openai": "^4.98.0",
     "webdriverio": "^9.12.7"
   },
