@@ -15,6 +15,6 @@ describe('Fluxo com iawdio', () => {
         await iawdio("Clique no botão 'Entrar'", { timeoutMsg: "O botão de login não foi encontrado", element: enter })
 
         await iawdio("É esperado que seja exibida a mensagem de 'Login incorreto ou device cadastrado no local incorreto'",
-            { timeoutMsg: "A mensagem de login incorreto não foi encontrada", element: toast })
+            { timeoutMsg: "O toast não foi exibido", element: toast, useWait: false })
     })
 })

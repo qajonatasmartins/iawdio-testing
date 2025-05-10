@@ -69,7 +69,7 @@ Se a validação não passar, o teste deve falhar.
  * @param element - O elemento a ser utilizado.
  * @returns O comando TypeScript gerado.
  */
-export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, element?: string): Promise<string> {
+export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, element?: string, useWait?: boolean): Promise<string> {
 
   const fullPrompt = element
     ? `
@@ -78,7 +78,7 @@ A variável "mapeamento" já contém o seletor WebdriverIO válido para o elemen
 Portanto, não leia o XML. Apenas utilize diretamente o seletor. Exemplo: Aplique a ação solicitada sobre esse elemento: $('${element}').setValue("valor") ou $('${element}').click() ou $('${element}').getText()
 
 🛑 Regras obrigatórias:
-- Sempre aguarde o elemento: await $('${element}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} });
+- Sempre aguarde o elemento: await $('${element}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} }).
 - Se o elemento não existir ou o valor não estiver correto, o teste deve falhar imediatamente. Aqui você deve usar as validações da biblioteca do Chai(expect, should, assert) ou do WebdriverIO(expect).
 📌 Comando do usuário:
 ${prompt}

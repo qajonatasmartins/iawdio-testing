@@ -6,9 +6,9 @@ import { getPageXML } from './appium.helper'
  * Executa um comando de teste a partir de uma instrução em português,
  * mapeando a tela atual (XML) com apoio da IA.
  */
-export async function iawdio(prompt: string, { timeoutMsg, element }: { timeoutMsg?: string, element?: string }): Promise<void> {
+export async function iawdio(prompt: string, { timeoutMsg, element, useWait = true }: { timeoutMsg?: string, element?: string, useWait?: boolean }): Promise<void> {
     const xml = await getPageXML()
-    const comando = await parseAndGenerateCommand(prompt, xml, timeoutMsg, element)
+    const comando = await parseAndGenerateCommand(prompt, xml, timeoutMsg, element, useWait)
     console.log(`\n🏃🏽 [IAWDIO] Executando o Prompt: \n${prompt} \n\n 👨🏽‍💻 Comando gerado: \n${comando}\n\n`)
 
     try {
