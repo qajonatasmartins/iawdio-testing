@@ -41,10 +41,10 @@ describe('Fluxo com iawdio', () => {
 })
 ```
 
-### Inicie a API para integrar com openIA
+### Inicie a API para integrar com openIA em uma aba do terminal
 
 `npm run start:api`
 
-### Execute seus testes mobile
+### Execute seus testes mobile em outra aba do terminal
 
 `npm run wdio`
