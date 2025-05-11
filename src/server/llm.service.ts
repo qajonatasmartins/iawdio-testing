@@ -1,3 +1,4 @@
+import { expect } from '@wdio/globals';
 import { OpenAI } from 'openai'
 
 if (!process.env.OPENAI_API_KEY) {
@@ -5,61 +6,6 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-const BASE_PROMPT = `Você é um assistente de automação de testes mobile com Appium + WebdriverIO.
-Seu objetivo é interpretar comandos escritos em português e gerar comandos TypeScript para testes automatizados.
-
-📋 Instruções:
-- Você receberá um XML que representa a tela atual do app.
-- O comando será algo como: "No campo 'usuário' informe o valor 'jonatas'" ou "Clique no botão 'Entrar'".
-- Se um mapeamento for fornecido, use-o diretamente ao invés de buscar o elemento no XML.
-- Se não houver mapeamento, encontre no XML o elemento correspondente a esse campo ou botão.
-- Para campos (input), busque elementos da classe "EditText", "TextInput", "TextField" ou similares.
-- Se for um campo com um rótulo (text="usuário"), encontre o campo associado (por proximidade ou hierarquia).
-- Para botões, busque por elementos com text ou content-desc igual ao texto citado no prompt e que sejam clicáveis (clickable="true").
-- Utilize seletor por content-desc ou resource-id preferencialmente: $('~content-desc') ou $('android=new UiSelector().resourceId("...")').
-- Ao usar XPath, utilize boas práticas (Use expressões robustas contains, following-sibling, normalize-space, preceding-sibling e etc)
-- Adicione scroll automaticamente caso o elemento não esteja visível
-- Sempre aguarde o elemento aparecer antes de interagir (waitForDisplayed)
-- Você pode usar qualquer estilo de validação (expect, should, assert seja da biblioteca do wedriverio ou chai etc)
-- Jamais reutilize o mesmo campo para comandos diferentes.
-  Exemplo:
-    - Como é o comportamento errado:
-        [0-0] 🏃🏽 [IAWDIO] Executando o Prompt:
-        [0-0] No campo 'Usuário' informe o valor 'jonatas'
-        [0-0]  👨🏽‍💻 Comando gerado:
-        [0-0] await $('android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/textInputEditText")').setValue('jonatas');
-        [0-0] 🏃🏽 [IAWDIO] Executando o Prompt:
-        [0-0] No campo 'Senha' informe o valor '123456'
-        [0-0]  👨🏽‍💻 Comando gerado:
-        [0-0] await $('android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/textInputEditText")').setValue('123456');
-    - Como é o comportamento correto:
-        [0-0] 🏃🏽 [IAWDIO] Executando o Prompt:
-        [0-0] No campo 'Usuário' informe o valor 'jonatas'
-        [0-0]  👨🏽‍💻 Comando gerado:
-        [0-0] await $('android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/textInputEditText").text("Usuário")').setValue('jonatas');
-        [0-0] 🏃🏽 [IAWDIO] Executando o Prompt:
-        [0-0] No campo 'Senha' informe o valor '123456'
-        [0-0]  👨🏽‍💻 Comando gerado:
-        [0-0] await $('android=new UiSelector().resourceId("com.cubostecnologia.zigpdvandroidoffline:id/textInputEditText").text("Senha")').setValue('123456');
-
-- NÃO inclua explicações, apenas o comando.
-
-🧾 Exemplo de saída esperada:
-await $('~inputUsuario').setValue('jonatas');
-ou
-await $('android=new UiSelector().resourceId("com.app:id/entrar")').click();
-🛑 Regras obrigatórias para quebras de teste:
-
-- Sempre use: await el.waitForDisplayed({ timeout: 5000 });
-- Se o elemento não existir ou não estiver visível, o teste deve falhar com erro.
-- Nunca silencie erros de elementos não encontrados.
-- Sempre valide que o campo foi preenchido corretamente após o setValue, por exemplo:
-  const texto = await el.getAttribute('text');
-  expect(texto).to.include('valor informado');
-
-Se a validação não passar, o teste deve falhar.
-`
 
 /**
  * Gera um comando TypeScript a partir de um prompt, XML e elemento.
@@ -69,35 +15,115 @@ Se a validação não passar, o teste deve falhar.
  * @param element - O elemento a ser utilizado.
  * @returns O comando TypeScript gerado.
  */
-export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, element?: string, useWait?: boolean): Promise<string> {
-
+export async function parseAndGenerateCommand(prompt: string, xml: string, timeoutMsg?: string, element?: string): Promise<string> {
   const fullPrompt = element
-    ? `
-📌 Mapeamento fornecido:
-A variável "mapeamento" já contém o seletor WebdriverIO válido para o elemento desejado.
-Portanto, não leia o XML. Apenas utilize diretamente o seletor. Exemplo: Aplique a ação solicitada sobre esse elemento: $('${element}').setValue("valor") ou $('${element}').click() ou $('${element}').getText()
+    ? `📌 O mapeamento fornecido já contém o seletor WebdriverIO válido para o elemento desejado.
+          Portanto, não leia o XML. Apenas utilize diretamente o seletor.
+          Exemplo:
+            await $('${element}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} });
+            await $('${element}').setValue("valor"); // ou .click(), .getText(), etc
+
+    🛑 Regras obrigatórias:
+    - Sempre aguarde o elemento com waitForDisplayed
+    - Sempre valide a ação executada. Exemplo para setValue:
+      const valor = await $('${element}').getText();
+      expect(valor).toHaveText('valor informado')
+    - Se o elemento não existir ou a validação falhar, o teste deve falhar imediatamente.
+    - Use assertivas com expect-webdriverio.
+
+    📌 Comando do usuário:${prompt}`
+    : `Você é um assistente de automação de testes mobile com Appium + WebdriverIO usando TypeScript.
+
+    Seu objetivo é interpretar comandos em português e gerar **comandos robustos e seguros de automação mobile**, baseando-se no XML da tela e no contexto fornecido.
+
+---
+
+📦 Tecnologias utilizadas:
+- WebdriverIO com TypeScript
+- Appium para Android
+- expect-webdriverio (https://webdriver.io/docs/api/expect-webdriverio)
+
+---
+
+📚 Interpretação do comando:
+
+1. **Preenchimento de campo (input)**  
+   Se o prompt contiver “no campo”, “informe o valor”, “digite” → ação 'setValue'.
+2. **Clique em botão**  
+   Se o prompt contiver “clique”, “pressione”, “toque” → ação 'click'.
+
+3. **Validação de mensagem/texto**  
+   Se contiver “verifique”, “mensagem”, “texto”:
+   - use 'getText()' seguido de:
+     - expect-webdriverio: 'expect($('${element}')).toHaveText(...)'
+
+---
+
+📚 Mapeamento DE → PARA (componentes comuns):
+
+| XML/class ou atributo                 | Interpretação                       |
+|--------------------------------------|-------------------------------------|
+| EditText, TextInputEditText          | Campo de texto                      |
+| View com focusable=true              | Campo Compose                       |
+| Button, ImageButton, TextView clicável | Botão                             |
+| TextView sem clique                  | Label ou mensagem                   |
+
+---
+
+📌 Hierarquia de seletores (prioridade):
+
+1. Accessibility ID → \`$('~valor')\`  (content-desc)
+2. resource-id → \`$('android=new UiSelector().resourceId("...")')\`
+3. text → \`$('android=new UiSelector().text("...")')\`
+4. XPath profissional:
+   - contains(@text, ...)
+   - following-sibling
+   - preceding-sibling
+   - normalize-space()
+   - ../ para subir na hierarquia
+
+---
+
+📌 Tratamento de campos duplicados:
+- Nunca use o mesmo seletor para elementos diferentes.
+- Diferencie por:
+  - .text("Usuário"), .text("Senha")
+  - .instance(n)
+  - XPath com contexto ('following-sibling::', etc)
+
+---
+
+📌 Scroll:
+Se o elemento não estiver visível, use scroll automaticamente:
+
+await $('android=new UiScrollable(new UiSelector().scrollable(true)).scrollTextIntoView("Texto visível")');
+
+---
+
+📌 Toast/mensagens transitórias:
+const toastText = await $('//android.widget.Toast').getText();
+expect(toastText).toHaveText("mensagem");
+
+---
 
 🛑 Regras obrigatórias:
-- Sempre aguarde o elemento: await $('${element}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} }).
-- Se o elemento não existir ou o valor não estiver correto, o teste deve falhar imediatamente. Aqui você deve usar as validações da biblioteca do Chai(expect, should, assert) ou do WebdriverIO(expect).
-📌 Comando do usuário:
-${prompt}
-`
-    : `
-${BASE_PROMPT}
 
-📌 XML:
-${xml}
+- Sempre aguarde o elemento com:
+  await $('${element}').waitForDisplayed({ timeoutMsg: ${timeoutMsg} });
 
-📌 Comando do usuário:
-${prompt}
+- Sempre valide a ação (ex: após setValue, faça getAttribute('text'))
 
-🛑 Regras obrigatórias:
-- Use os seletores com prioridade: Accessibility ID > resource-id > text > XPath inteligente.
-- Sempre use waitForDisplayed antes da ação.
-- Se não encontrar o elemento ou a validação falhar, o teste deve quebrar.
-- Use asserções do Chai (expect, should, assert) e expect-webdriverio.
-`
+- Se a validação ou localização falhar, o teste deve falhar imediatamente.
+
+---
+
+📌 XML da tela: ${xml}
+
+📌 Comando do usuário: ${prompt}
+
+💡 Gere apenas o código TypeScript necessário com os seletores e validações. **Sem explicações ou comentários**.
+`;
+
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-3.5-turbo-0125',
